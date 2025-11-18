@@ -1,0 +1,2271 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>Pet Dat Dog - Community Driven Cryptocurrency</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    /* Hide scrollbar but keep scrolling functionality */
+    html {
+      overflow: -moz-scrollbars-none;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      scroll-behavior: smooth;
+    }
+
+    html::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+      /* Hide scrollbar for webkit browsers */
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    body::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    /* Cyberpunk Node Network Background */
+    #nodeCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9998;
+      opacity: 0.6;
+    }
+
+    /* Background with animated gradient orbs */
+    .background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.4;
+      animation: float-orb 20s ease-in-out infinite;
+    }
+
+    .orb1 {
+      width: clamp(300px, 50vw, 600px);
+      height: clamp(300px, 50vw, 600px);
+      top: -15%;
+      left: -15%;
+      animation-delay: 0s;
+      animation-duration: 25s;
+    }
+
+    .orb2 {
+      width: clamp(250px, 45vw, 500px);
+      height: clamp(250px, 45vw, 500px);
+      bottom: -15%;
+      right: -15%;
+      animation-delay: 5s;
+      animation-duration: 30s;
+    }
+
+    .orb3 {
+      width: clamp(200px, 40vw, 450px);
+      height: clamp(200px, 40vw, 450px);
+      top: 50%;
+      left: 50%;
+      animation-delay: 10s;
+      animation-duration: 20s;
+    }
+
+    @keyframes float-orb {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+      }
+      33% {
+        transform: translate(50px, -50px) scale(1.1);
+      }
+      66% {
+        transform: translate(-30px, 30px) scale(0.9);
+      }
+    }
+
+    .container {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 5vw, 5%);
+      position: relative;
+    }
+
+    /* Dark Mode Toggle */
+    .dark-mode-toggle {
+      position: fixed;
+      top: clamp(1rem, 3vw, 2rem);
+      right: clamp(1rem, 3vw, 2rem);
+      z-index: 10000;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(20px) saturate(180%);
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      border-radius: 50%;
+      width: clamp(50px, 8vw, 60px);
+      height: clamp(50px, 8vw, 60px);
+      font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+      cursor: pointer;
+      transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), 
+                  background 0.3s ease,
+                  border-color 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15),
+                  inset 0 1px 1px rgba(255, 255, 255, 0.3),
+                  inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+    }
+
+    .dark-mode-toggle:hover {
+      transform: scale(1.15) rotate(15deg);
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 12px 48px rgba(100, 200, 255, 0.3),
+                  0 8px 24px rgba(0, 0, 0, 0.2),
+                  inset 0 2px 2px rgba(255, 255, 255, 0.4);
+    }
+
+    /* Infection overlay for dark mode transition */
+    .infection-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0;
+    }
+
+    /* Subtle corruption effect */
+    .binary-corrupt {
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Subtle glitch effect during transition */
+    .binary-corrupt.infected {
+      animation: subtleGlitch 0.6s ease-out;
+    }
+
+    @keyframes subtleGlitch {
+      0%, 100% { 
+        transform: translate(0, 0);
+        filter: brightness(1);
+      }
+      15% { 
+        transform: translate(-1px, 1px);
+        filter: brightness(1.1);
+      }
+      30% { 
+        transform: translate(1px, -1px);
+        filter: brightness(0.95);
+      }
+      45% { 
+        transform: translate(-0.5px, -0.5px);
+        filter: brightness(1.05);
+      }
+      60% { 
+        transform: translate(0.5px, 0.5px);
+        filter: brightness(1);
+      }
+    }
+
+    /* Terminal cursor effect - disabled */
+    .terminal-cursor {
+      display: none;
+    }
+
+    /* Main Content */
+    .main-content {
+      max-width: min(1200px, 95vw);
+      width: 100%;
+      text-align: center;
+      margin: clamp(1rem, 3vw, 2rem) auto;
+    }
+
+    /* Logo with 3D effect */
+    .logo-section {
+      margin-bottom: 2rem;
+      perspective: 1000px;
+      opacity: 0;
+      animation: fadeInScale 1s ease-out 0.2s forwards;
+    }
+
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.8) translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .dog-emoji {
+      font-size: clamp(4rem, 12vw, 7rem);
+      display: inline-block;
+      animation: float3d 4s ease-in-out infinite;
+      filter: drop-shadow(0 20px 40px rgba(255, 183, 77, 0.5));
+      text-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    @keyframes float3d {
+      0%, 100% { 
+        transform: translateY(0px) rotateY(-10deg) rotateX(5deg);
+      }
+      50% { 
+        transform: translateY(-20px) rotateY(10deg) rotateX(-5deg);
+      }
+    }
+
+    /* Hero with floating letter wave animation */
+    .hero-title {
+      font-size: clamp(2.5rem, 8vw, 5.5rem);
+      font-weight: 900;
+      margin: 0 0 clamp(1rem, 2vw, 1.5rem) 0;
+      line-height: 1;
+      letter-spacing: clamp(-2px, -0.3vw, -3px);
+      opacity: 0;
+      animation: slideInUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+      position: relative;
+      display: inline-block;
+    }
+
+    .hero-title span {
+      display: inline-block;
+      animation: float-letter 3s ease-in-out infinite;
+    }
+
+    .hero-title span:nth-child(1) { animation-delay: 0s; }
+    .hero-title span:nth-child(2) { animation-delay: 0.1s; }
+    .hero-title span:nth-child(3) { animation-delay: 0.2s; }
+    .hero-title span:nth-child(4) { animation-delay: 0.3s; }
+    .hero-title span:nth-child(5) { animation-delay: 0.4s; }
+    .hero-title span:nth-child(6) { animation-delay: 0.5s; }
+    .hero-title span:nth-child(7) { animation-delay: 0.6s; }
+    .hero-title span:nth-child(8) { animation-delay: 0.7s; }
+    .hero-title span:nth-child(9) { animation-delay: 0.8s; }
+    .hero-title span:nth-child(10) { animation-delay: 0.9s; }
+    .hero-title span:nth-child(11) { animation-delay: 1s; }
+
+    @keyframes float-letter {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-15px);
+      }
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(60px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
+      margin: 0 0 clamp(0.75rem, 1.5vw, 1rem) 0;
+      font-weight: 600;
+      opacity: 0;
+      animation: slideInUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
+      text-transform: uppercase;
+      letter-spacing: clamp(1px, 0.3vw, 3px);
+    }
+
+    .hero-tagline {
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+      margin: 0 0 clamp(2rem, 4vw, 3rem) 0;
+      opacity: 0;
+      font-style: italic;
+      font-weight: 400;
+      animation: slideInUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards;
+      overflow: hidden;
+      border-right: 2px solid;
+      white-space: nowrap;
+      width: 0;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-tagline.typing {
+      animation: slideInUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards,
+                 typing 3s steps(50) 1.5s forwards,
+                 blink 0.75s step-end infinite 1.5s;
+      max-width: 100%;
+    }
+
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent; }
+    }
+
+    /* Premium CTA - Glassmorphism Style */
+    .cta-button {
+      padding: clamp(1rem, 2.5vw, 1.5rem) clamp(2.5rem, 6vw, 4rem);
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+      font-weight: 700;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: clamp(20px, 4vw, 30px);
+      cursor: pointer;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.12) 100%);
+      backdrop-filter: blur(60px) saturate(250%);
+      color: inherit;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-bottom: clamp(3rem, 6vw, 5rem);
+      text-transform: uppercase;
+      letter-spacing: clamp(1px, 0.25vw, 2px);
+      position: relative;
+      overflow: hidden;
+      opacity: 1 !important;
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15),
+                  0 8px 24px rgba(100, 200, 255, 0.15),
+                  inset 0 2px 4px rgba(255, 255, 255, 0.4),
+                  inset 0 -3px 6px rgba(0, 0, 0, 0.1),
+                  0 0 60px rgba(255, 255, 255, 0.08);
+      animation: popIn 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1s forwards, ctaPulse 4s ease-in-out infinite 2s !important;
+      z-index: 1;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Enhanced border for light mode visibility */
+    body.light-mode .cta-button {
+      border: 2px solid rgba(59, 130, 246, 0.5);
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15),
+                  0 8px 24px rgba(59, 130, 246, 0.2),
+                  inset 0 2px 4px rgba(255, 255, 255, 0.4),
+                  inset 0 -3px 6px rgba(0, 0, 0, 0.1),
+                  0 0 60px rgba(59, 130, 246, 0.15);
+    }
+
+    body.light-mode .cta-button:hover {
+      border-color: rgba(59, 130, 246, 0.7);
+    }
+
+    .cta-button > * {
+      position: relative;
+      z-index: 2;
+    }
+
+    .cta-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+      transition: left 0.6s ease;
+      z-index: 1;
+    }
+
+    .cta-button::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 215, 0, 0.2) 0%, transparent 70%);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s ease, height 0.6s ease;
+      z-index: 1;
+    }
+
+    @keyframes popIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(30px);
+      }
+      50% {
+        transform: scale(1.05) translateY(-5px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    @keyframes ctaPulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15),
+                    0 8px 24px rgba(100, 200, 255, 0.15),
+                    inset 0 2px 4px rgba(255, 255, 255, 0.4),
+                    inset 0 -3px 6px rgba(0, 0, 0, 0.1),
+                    0 0 60px rgba(255, 255, 255, 0.08);
+      }
+      50% {
+        transform: scale(1.02);
+        box-shadow: 0 16px 56px rgba(0, 0, 0, 0.2),
+                    0 10px 32px rgba(100, 200, 255, 0.2),
+                    inset 0 2px 4px rgba(255, 255, 255, 0.5),
+                    inset 0 -3px 6px rgba(0, 0, 0, 0.15),
+                    0 0 80px rgba(100, 200, 255, 0.15);
+      }
+    }
+
+    .cta-button:hover {
+      transform: translateY(-8px) scale(1.05);
+      border-color: rgba(255, 255, 255, 0.6);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+      backdrop-filter: blur(80px) saturate(300%);
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.3),
+                  inset 0 3px 6px rgba(255, 255, 255, 0.5),
+                  inset 0 -3px 8px rgba(100, 200, 255, 0.25),
+                  0 0 100px rgba(100, 200, 255, 0.4);
+    }
+
+    .cta-button:active {
+      transform: translateY(-4px) scale(1.02);
+      transition: all 0.1s ease;
+      animation: buttonClick 0.3s ease;
+    }
+
+    @keyframes buttonClick {
+      0% {
+        box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15),
+                    0 8px 24px rgba(100, 200, 255, 0.15),
+                    inset 0 2px 4px rgba(255, 255, 255, 0.4),
+                    inset 0 -3px 6px rgba(0, 0, 0, 0.1),
+                    0 0 60px rgba(255, 255, 255, 0.08);
+      }
+      50% {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2),
+                    0 4px 16px rgba(100, 200, 255, 0.25),
+                    inset 0 1px 2px rgba(255, 255, 255, 0.5),
+                    inset 0 -2px 4px rgba(0, 0, 0, 0.15),
+                    0 0 80px rgba(100, 200, 255, 0.5);
+      }
+      100% {
+        box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15),
+                    0 8px 24px rgba(100, 200, 255, 0.15),
+                    inset 0 2px 4px rgba(255, 255, 255, 0.4),
+                    inset 0 -3px 6px rgba(0, 0, 0, 0.1),
+                    0 0 60px rgba(255, 255, 255, 0.08);
+      }
+    }
+
+    .cta-button:hover::before {
+      left: 100%;
+    }
+
+    .cta-button:hover::after {
+      width: 300px;
+      height: 300px;
+    }
+
+    /* Section Styles */
+    .section {
+      margin: 6rem 0;
+      opacity: 0;
+      animation: fadeIn 1s ease-out forwards;
+    }
+
+    .section.slide-in-left {
+      animation: slideInLeft 1s ease-out forwards;
+    }
+
+    .section.slide-in-right {
+      animation: slideInRight 1s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-100px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(100px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      margin: 0 0 clamp(0.75rem, 1.5vw, 1rem) 0;
+      text-transform: uppercase;
+      letter-spacing: clamp(0.5px, 0.15vw, 1px);
+    }
+
+    .section-subtitle {
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      margin: 0 0 clamp(2rem, 4vw, 3rem) 0;
+      opacity: 0.8;
+      max-width: min(700px, 90vw);
+      margin-left: auto;
+      margin-right: auto;
+      padding: 0 clamp(1rem, 3vw, 0);
+    }
+
+    /* Stats with counter animation */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(clamp(250px, 30vw, 280px), 1fr));
+      gap: clamp(1.5rem, 4vw, 2.5rem);
+      margin: clamp(3rem, 8vw, 6rem) 0;
+      width: 100%;
+      padding: 0 clamp(1rem, 3vw, 0);
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.06) 100%);
+      backdrop-filter: blur(60px) saturate(250%);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: clamp(20px, 4vw, 30px);
+      padding: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 3vw, 2rem);
+      text-align: center;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15),
+                  0 8px 24px rgba(100, 200, 255, 0.15),
+                  inset 0 2px 4px rgba(255, 255, 255, 0.4),
+                  inset 0 -3px 6px rgba(0, 0, 0, 0.1),
+                  0 0 60px rgba(255, 255, 255, 0.08);
+      opacity: 0;
+      transform: translateY(50px);
+      position: relative;
+      overflow: hidden;
+      animation: floatCard 6s ease-in-out infinite;
+    }
+
+    @keyframes floatCard {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .stat-card:hover::before {
+      left: 100%;
+    }
+
+    .stat-card.animate {
+      animation: slideUpFade 0.8s ease-out forwards;
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.3s; }
+    .stat-card:nth-child(3) { animation-delay: 0.5s; }
+
+    @keyframes slideUpFade {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .stat-card:hover {
+      transform: translateY(-15px);
+      border-color: rgba(255, 255, 255, 0.5);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.1) 100%);
+      backdrop-filter: blur(80px) saturate(300%);
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.3),
+                  inset 0 3px 6px rgba(255, 255, 255, 0.5),
+                  inset 0 -3px 8px rgba(100, 200, 255, 0.25),
+                  0 0 100px rgba(100, 200, 255, 0.4);
+    }
+
+    .stat-number {
+      font-size: 3.5rem;
+      font-weight: 900;
+      margin: 0 0 0.5rem 0;
+      letter-spacing: -1px;
+      filter: drop-shadow(0 2px 8px rgba(100, 200, 255, 0.3));
+      animation: pulseStat 3s ease-in-out infinite;
+    }
+
+    @keyframes pulseStat {
+      0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 2px 8px rgba(100, 200, 255, 0.3));
+      }
+      50% {
+        transform: scale(1.05);
+        filter: drop-shadow(0 4px 16px rgba(100, 200, 255, 0.5));
+      }
+    }
+
+    .stat-label {
+      font-size: 1rem;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 600;
+    }
+
+    /* Feature Cards */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(clamp(280px, 35vw, 300px), 1fr));
+      gap: clamp(1.5rem, 4vw, 2.5rem);
+      margin: clamp(2rem, 5vw, 3rem) 0;
+      text-align: left;
+      width: 100%;
+      padding: 0 clamp(1rem, 3vw, 0);
+    }
+
+    .feature-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.06) 100%);
+      backdrop-filter: blur(60px) saturate(250%);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 25px;
+      padding: 2.5rem;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15),
+                  0 6px 20px rgba(100, 200, 255, 0.12),
+                  inset 0 2px 4px rgba(255, 255, 255, 0.35),
+                  inset 0 -3px 6px rgba(0, 0, 0, 0.12),
+                  0 0 60px rgba(255, 255, 255, 0.08);
+      position: relative;
+      overflow: hidden;
+      animation: breatheCard 8s ease-in-out infinite;
+    }
+
+    .feature-card:nth-child(1) { animation-delay: 0s; }
+    .feature-card:nth-child(2) { animation-delay: 0.5s; }
+    .feature-card:nth-child(3) { animation-delay: 1s; }
+
+    @keyframes breatheCard {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1),
+                    0 4px 12px rgba(100, 200, 255, 0.08),
+                    inset 0 1px 2px rgba(255, 255, 255, 0.25),
+                    inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+      }
+      50% {
+        transform: scale(1.02);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15),
+                    0 6px 16px rgba(100, 200, 255, 0.15),
+                    inset 0 2px 3px rgba(255, 255, 255, 0.3),
+                    inset 0 -3px 6px rgba(0, 0, 0, 0.15);
+      }
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .feature-card:hover::before {
+      left: 100%;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-12px);
+      border-color: rgba(255, 255, 255, 0.5);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+      backdrop-filter: blur(80px) saturate(300%);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3),
+                  inset 0 3px 6px rgba(255, 255, 255, 0.5),
+                  inset 0 -3px 8px rgba(100, 200, 255, 0.2),
+                  0 0 80px rgba(100, 200, 255, 0.35);
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: block;
+      animation: bounceIcon 4s ease-in-out infinite;
+    }
+
+    @keyframes bounceIcon {
+      0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+      }
+      25% {
+        transform: translateY(-8px) rotate(-5deg);
+      }
+      75% {
+        transform: translateY(-8px) rotate(5deg);
+      }
+    }
+
+    .feature-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 1rem 0;
+    }
+
+    .feature-text {
+      font-size: 1rem;
+      opacity: 0.85;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* Steps */
+    .steps-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(clamp(220px, 30vw, 250px), 1fr));
+      gap: clamp(1.5rem, 3vw, 2rem);
+      margin: clamp(2rem, 5vw, 3rem) 0;
+      width: 100%;
+      padding: 0 clamp(1rem, 3vw, 0);
+    }
+
+    .step-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.05) 100%);
+      backdrop-filter: blur(50px) saturate(220%);
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      border-radius: 20px;
+      padding: 2.5rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+      box-shadow: 0 10px 32px rgba(0, 0, 0, 0.12),
+                  inset 0 2px 3px rgba(255, 255, 255, 0.3),
+                  0 0 50px rgba(255, 255, 255, 0.06);
+      animation: swayCard 7s ease-in-out infinite;
+    }
+
+    .step-card:nth-child(1) { animation-delay: 0s; }
+    .step-card:nth-child(2) { animation-delay: 0.3s; }
+    .step-card:nth-child(3) { animation-delay: 0.6s; }
+
+    @keyframes swayCard {
+      0%, 100% {
+        transform: rotate(0deg) translateY(0px);
+      }
+      33% {
+        transform: rotate(1deg) translateY(-5px);
+      }
+      66% {
+        transform: rotate(-1deg) translateY(-5px);
+      }
+    }
+
+    .step-card:hover {
+      transform: scale(1.08);
+      border-color: rgba(255, 255, 255, 0.45);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.08) 100%);
+      backdrop-filter: blur(70px) saturate(280%);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25),
+                  inset 0 3px 5px rgba(255, 255, 255, 0.45),
+                  0 0 70px rgba(100, 200, 255, 0.3);
+    }
+
+    .step-number {
+      font-size: 3rem;
+      font-weight: 900;
+      opacity: 0.3;
+      margin: 0 0 1rem 0;
+    }
+
+    .step-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem 0;
+    }
+
+    .step-text {
+      font-size: 0.95rem;
+      opacity: 0.8;
+      line-height: 1.5;
+    }
+
+
+
+    /* FAQ */
+    .faq-container {
+      max-width: 800px;
+      margin: 3rem auto;
+      text-align: left;
+    }
+
+    .faq-item {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.05) 100%);
+      backdrop-filter: blur(50px) saturate(220%);
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      border-radius: 15px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12),
+                  inset 0 2px 3px rgba(255, 255, 255, 0.3),
+                  0 0 50px rgba(255, 255, 255, 0.06);
+      animation: glowPulse 5s ease-in-out infinite;
+    }
+
+    .faq-item:nth-child(1) { animation-delay: 0s; }
+    .faq-item:nth-child(2) { animation-delay: 0.4s; }
+    .faq-item:nth-child(3) { animation-delay: 0.8s; }
+    .faq-item:nth-child(4) { animation-delay: 1.2s; }
+
+    @keyframes glowPulse {
+      0%, 100% {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1),
+                    inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      }
+      50% {
+        box-shadow: 0 6px 24px rgba(100, 200, 255, 0.15),
+                    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+      }
+    }
+
+    .faq-item:hover {
+      border-color: rgba(255, 255, 255, 0.45);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.08) 100%);
+      backdrop-filter: blur(70px) saturate(280%);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2),
+                  inset 0 3px 5px rgba(255, 255, 255, 0.45),
+                  0 0 60px rgba(100, 200, 255, 0.3);
+    }
+
+    .faq-question {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .faq-answer {
+      font-size: 1rem;
+      opacity: 0.85;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* Social Section */
+    .social-section {
+      margin: 6rem 0 3rem;
+    }
+
+    .social-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin: 0 0 2rem 0;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .social-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .social-link {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.06) 100%);
+      backdrop-filter: blur(55px) saturate(240%);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      padding: 2rem;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.2rem;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 10px 36px rgba(0, 0, 0, 0.18),
+                  inset 0 2px 3px rgba(255, 255, 255, 0.35),
+                  0 0 55px rgba(255, 255, 255, 0.07);
+      animation: scalePulse 4s ease-in-out infinite;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .social-link::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s ease, height 0.6s ease;
+      z-index: 0;
+    }
+
+    .social-link:nth-child(1) { animation-delay: 0s; }
+    .social-link:nth-child(2) { animation-delay: 0.3s; }
+    .social-link:nth-child(3) { animation-delay: 0.6s; }
+    .social-link:nth-child(4) { animation-delay: 0.9s; }
+
+    @keyframes scalePulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.03);
+      }
+    }
+
+    .social-link:hover {
+      transform: translateY(-12px) scale(1.05);
+      border-color: rgba(255, 255, 255, 0.55);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.1) 100%);
+      backdrop-filter: blur(75px) saturate(290%);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3),
+                  inset 0 3px 6px rgba(255, 255, 255, 0.5),
+                  inset 0 -3px 8px rgba(100, 200, 255, 0.2),
+                  0 0 80px rgba(100, 200, 255, 0.35);
+    }
+
+    .social-link:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .social-link:active {
+      transform: translateY(-8px) scale(1.02);
+      transition: all 0.1s ease;
+      animation: socialClick 0.3s ease;
+    }
+
+    @keyframes socialClick {
+      0% {
+        box-shadow: 0 10px 36px rgba(0, 0, 0, 0.18),
+                    inset 0 2px 3px rgba(255, 255, 255, 0.35),
+                    0 0 55px rgba(255, 255, 255, 0.07);
+      }
+      50% {
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25),
+                    inset 0 1px 2px rgba(255, 255, 255, 0.4),
+                    0 0 70px rgba(100, 200, 255, 0.4);
+      }
+      100% {
+        box-shadow: 0 10px 36px rgba(0, 0, 0, 0.18),
+                    inset 0 2px 3px rgba(255, 255, 255, 0.35),
+                    0 0 55px rgba(255, 255, 255, 0.07);
+      }
+    }
+
+    .social-link > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .social-icon {
+      font-size: 2.5rem;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      display: inline-block;
+    }
+
+    .social-link:hover .social-icon {
+      transform: scale(1.15) rotate(5deg);
+    }
+
+    /* Animation classes for pre-redirect effects */
+    .social-link.animating {
+      pointer-events: none;
+    }
+
+    /* Plane takeoff animation */
+    @keyframes planeTakeoff {
+      0% {
+        transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+        opacity: 1;
+      }
+      20% {
+        transform: translateY(-15px) translateX(5px) rotate(-15deg) scale(1.3);
+        opacity: 1;
+      }
+      50% {
+        transform: translateY(-40px) translateX(15px) rotate(-35deg) scale(1.5);
+        opacity: 0.7;
+      }
+      80% {
+        transform: translateY(-70px) translateX(30px) rotate(-50deg) scale(1.8);
+        opacity: 0.4;
+      }
+      100% {
+        transform: translateY(-100px) translateX(50px) rotate(-60deg) scale(2);
+        opacity: 0;
+      }
+    }
+
+    .social-link.telegram-animate .social-icon {
+      animation: planeTakeoff 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      z-index: 10;
+      position: relative;
+    }
+
+    /* X spinning animation */
+    @keyframes xSpin {
+      0% {
+        transform: rotate(0deg) scale(1);
+        opacity: 1;
+        filter: brightness(1);
+      }
+      25% {
+        transform: rotate(180deg) scale(1.2);
+        opacity: 0.95;
+        filter: brightness(1.2);
+      }
+      50% {
+        transform: rotate(360deg) scale(1.4);
+        opacity: 0.85;
+        filter: brightness(1.4);
+      }
+      75% {
+        transform: rotate(540deg) scale(1.6);
+        opacity: 0.6;
+        filter: brightness(1.6);
+      }
+      100% {
+        transform: rotate(720deg) scale(1.8);
+        opacity: 0;
+        filter: brightness(2);
+      }
+    }
+
+    .social-link.twitter-animate .social-icon {
+      animation: xSpin 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      z-index: 10;
+      position: relative;
+    }
+
+    /* Chart animation */
+    @keyframes chartPulse {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      30% {
+        transform: scale(1.3);
+        opacity: 0.9;
+      }
+      60% {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+      100% {
+        transform: scale(1.5);
+        opacity: 0;
+      }
+    }
+
+    .social-link.chart-animate .social-icon {
+      animation: chartPulse 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    /* Contract Address */
+    .contract-address {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .contract-code {
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      opacity: 0.7;
+      margin-top: 0.5rem;
+      word-break: break-all;
+      padding: 0.5rem;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+    }
+
+    .copy-tooltip {
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%) scale(0);
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .copy-tooltip.show {
+      transform: translateX(-50%) scale(1);
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 6rem;
+      padding: 3rem 0;
+      font-size: 0.9rem;
+      opacity: 0.7;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .disclaimer {
+      max-width: 900px;
+      margin: 0 auto 2rem;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      text-align: left;
+    }
+
+    .disclaimer-title {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    /* Dark/Light Mode Transitions */
+    body {
+      transition: background 0.8s ease, color 0.8s ease;
+    }
+
+    body.dark-mode {
+      background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
+      color: #e8e8e8;
+    }
+
+    .orb {
+      transition: background 0.8s ease;
+    }
+
+    .dark-mode .orb1 {
+      background: radial-gradient(circle, #4a9eff, #667eea);
+    }
+
+    .dark-mode .orb2 {
+      background: radial-gradient(circle, #667eea, #764ba2);
+    }
+
+    .dark-mode .orb3 {
+      background: radial-gradient(circle, #f093fb, #667eea);
+    }
+
+    body.light-mode {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e3e8ef 100%);
+      color: #1a1a1a;
+    }
+
+    .light-mode .orb1 {
+      background: radial-gradient(circle, #93c5fd, #bfdbfe);
+    }
+
+    .light-mode .orb2 {
+      background: radial-gradient(circle, #a7f3d0, #6ee7b7);
+    }
+
+    .light-mode .orb3 {
+      background: radial-gradient(circle, #fda4af, #fecdd3);
+    }
+
+    /* Smooth transitions for all elements */
+    .stat-card, .feature-card, .step-card, .faq-item, .social-link, .cta-button {
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1), background 0.8s ease, border-color 0.8s ease, color 0.8s ease !important;
+    }
+
+    body.dark-mode .cta-button {
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Responsive - Enhanced for all screen sizes */
+    @media (max-width: 768px) {
+      #nodeCanvas {
+        display: none;
+      }
+
+      .stats-grid,
+      .features-grid,
+      .steps-container,
+      .social-grid {
+        grid-template-columns: 1fr;
+        gap: clamp(1rem, 3vw, 1.5rem);
+      }
+
+      .logo-section {
+        margin-bottom: clamp(1rem, 3vw, 2rem);
+      }
+
+      .section {
+        margin: clamp(3rem, 8vw, 6rem) 0;
+      }
+
+      .faq-container {
+        padding: 0 clamp(0.5rem, 2vw, 1rem);
+      }
+
+      .social-grid {
+        max-width: 100%;
+        padding: 0 clamp(1rem, 3vw, 0);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-tagline {
+        white-space: normal;
+        border-right: none;
+        width: auto;
+      }
+
+      .hero-tagline.typing {
+        animation: slideInUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards;
+      }
+
+      .stat-card,
+      .feature-card,
+      .step-card {
+        padding: clamp(1.5rem, 4vw, 2rem) clamp(1rem, 3vw, 1.5rem);
+      }
+    }
+
+    /* Ensure proper centering on all screen sizes */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body class="light-mode"><!-- Infection overlay for dark mode transition -->
+  <canvas id="infectionCanvas" class="infection-overlay"></canvas>
+  <div id="terminalCursor" class="terminal-cursor"></div><!-- Node Network Canvas -->
+  <canvas id="nodeCanvas"></canvas><!-- Animated Background -->
+  <div class="background">
+   <div class="orb orb1"></div>
+   <div class="orb orb2"></div>
+   <div class="orb orb3"></div>
+  </div><!-- Dark Mode Toggle --> <button class="dark-mode-toggle" id="dark-mode-toggle" aria-label="Toggle dark mode">🌙</button>
+  <div class="container">
+   <main class="main-content"><!-- Logo Section -->
+    <div class="logo-section"><span class="dog-emoji" id="dog-emoji" style="cursor: pointer;">🐕</span>
+    </div><!-- Hero Section -->
+    <h1 class="hero-title" id="hero-title"><span>P</span><span>E</span><span>T</span><span> </span><span>D</span><span>A</span><span>T</span><span> </span><span>D</span><span>O</span><span>G</span></h1>
+    <h2 class="hero-subtitle" id="hero-subtitle">Community-Driven Cryptocurrency</h2>
+    <p class="hero-tagline" id="hero-tagline">"Building a transparent digital future together"</p><button class="cta-button binary-corrupt" id="cta-button">JOIN NOW</button> <!-- About Section -->
+    <section class="section" id="about-section">
+     <h3 class="section-title" id="about-title">What is Pet Dat Dog?</h3>
+     <p class="section-subtitle" id="about-text">Pet Dat Dog is a community-driven digital currency project. We believe in transparency, education, and building a supportive community for everyone interested in learning about cryptocurrency - from complete beginners to experienced enthusiasts.</p>
+    </section><!-- Stats Section -->
+    <div class="stats-grid">
+     <div class="stat-card binary-corrupt">
+      <div class="stat-number" id="stat-one-number">
+       1
+      </div>
+      <div class="stat-label" id="stat-one-label">
+       COMMUNITY MEMBERS
+      </div>
+     </div>
+     <div class="stat-card binary-corrupt">
+      <div class="stat-number" id="stat-two-number">
+       0
+      </div>
+      <div class="stat-label" id="stat-two-label">
+       MARKET CAP
+      </div>
+     </div>
+     <div class="stat-card binary-corrupt">
+      <div class="stat-number" id="stat-three-number">
+       0
+      </div>
+      <div class="stat-label" id="stat-three-label">
+       COMMUNITY SUPPORT
+      </div>
+     </div>
+    </div><!-- How It Works Section -->
+    <section class="section slide-in-left" id="how-section">
+     <h3 class="section-title" id="how-title">How It Works</h3>
+     <p class="section-subtitle" id="how-subtitle">Getting started with cryptocurrency doesn't have to be complicated. Here's how to join our community:</p>
+     <div class="steps-container">
+      <div class="step-card binary-corrupt">
+       <div class="step-number">
+        1
+       </div>
+       <div class="step-title" id="step-one-title">
+        Learn
+       </div>
+       <p class="step-text" id="step-one-text">Join our community to learn about cryptocurrency basics and best practices</p>
+      </div>
+      <div class="step-card binary-corrupt">
+       <div class="step-number">
+        2
+       </div>
+       <div class="step-title" id="step-two-title">
+        Connect
+       </div>
+       <p class="step-text" id="step-two-text">Meet other members and participate in community discussions</p>
+      </div>
+      <div class="step-card binary-corrupt">
+       <div class="step-number">
+        3
+       </div>
+       <div class="step-title" id="step-three-title">
+        Grow
+       </div>
+       <p class="step-text" id="step-three-text">Grow your knowledge and be part of a supportive community</p>
+      </div>
+     </div>
+    </section><!-- Why Choose Us Section -->
+    <section class="section slide-in-right" id="why-section">
+     <h3 class="section-title" id="why-title">Why Choose Us?</h3>
+     <p class="section-subtitle" id="why-subtitle">We prioritize transparency, education, and community support above everything else</p>
+     <div class="features-grid">
+      <div class="feature-card binary-corrupt"><span class="feature-icon">🔒</span>
+       <h4 class="feature-title" id="feature-one-title">Transparent</h4>
+       <p class="feature-text" id="feature-one-text">All our operations are transparent and verifiable on the blockchain. No hidden fees or surprises.</p>
+      </div>
+      <div class="feature-card binary-corrupt"><span class="feature-icon">📚</span>
+       <h4 class="feature-title" id="feature-two-title">Educational</h4>
+       <p class="feature-text" id="feature-two-text">We provide resources and support to help you understand cryptocurrency, whether you're new or experienced.</p>
+      </div>
+      <div class="feature-card binary-corrupt"><span class="feature-icon">👥</span>
+       <h4 class="feature-title" id="feature-three-title">Community First</h4>
+       <p class="feature-text" id="feature-three-text">Our community makes all major decisions together. Your voice matters and contributes to our direction.</p>
+      </div>
+     </div>
+    </section><!-- FAQ Section -->
+    <section class="section" id="faq-section">
+     <h3 class="section-title" id="faq-title">Frequently Asked Questions</h3>
+     <div class="faq-container">
+      <div class="faq-item binary-corrupt">
+       <div class="faq-question" id="faq-one-q"><span>What is cryptocurrency?</span> <span>💡</span>
+       </div>
+       <p class="faq-answer" id="faq-one-a">Cryptocurrency is digital money that uses encryption technology. It exists only online and isn't controlled by any government or bank. Think of it like regular money, but completely digital and decentralized.</p>
+      </div>
+      <div class="faq-item binary-corrupt">
+       <div class="faq-question" id="faq-two-q"><span>Is this safe?</span> <span>🔐</span>
+       </div>
+       <p class="faq-answer" id="faq-two-a">We prioritize security and transparency. Our smart contract is publicly audited and verified. However, all cryptocurrency investments carry risk, and you should never invest more than you can afford to lose.</p>
+      </div>
+      <div class="faq-item binary-corrupt">
+       <div class="faq-question" id="faq-three-q"><span>How do I get started?</span> <span>🚀</span>
+       </div>
+       <p class="faq-answer" id="faq-three-a">Join our community channels below to learn more. We provide educational resources and step-by-step guides for beginners. No question is too basic - we're here to help!</p>
+      </div>
+      <div class="faq-item binary-corrupt">
+       <div class="faq-question" id="faq-four-q"><span>What makes you different?</span> <span>⭐</span>
+       </div>
+       <p class="faq-answer" id="faq-four-a">We focus on education and community first. We're not promising quick riches - we're building a long-term, sustainable project where the community makes decisions together.</p>
+      </div>
+     </div>
+    </section><!-- Social Links -->
+    <section class="social-section" id="social-section">
+     <h3 class="social-title" id="social-title">Join Our Community</h3>
+     <div class="social-grid"><a href="https://t.me/DatDogcoin" class="social-link binary-corrupt" id="social-link-1" target="_blank" rel="noopener noreferrer"> <span class="social-icon">✈️</span> <span id="social-label-1">Telegram</span> </a> <a href="https://x.com/DatDogcoinsol?t=lwumvyaeB1wdZZcgnIdv9A&s=09" class="social-link binary-corrupt" id="social-link-2" target="_blank" rel="noopener noreferrer"> <span class="social-icon">✖️</span> <span id="social-label-2">X (Twitter)</span> </a> <a href="#social-section" class="social-link binary-corrupt" id="social-link-3"> <span class="social-icon">📊</span> <span id="social-label-3">View Chart</span> </a>
+      <div class="social-link contract-address binary-corrupt" id="social-link-4"><span class="copy-tooltip" id="copy-tooltip">Copied!</span> <span class="social-icon">📋</span> <span id="social-label-4">Contract Address</span>
+       <div class="contract-code" id="contract-code">
+        0x742d...4c8f
+       </div>
+      </div>
+     </div>
+    </section><!-- Footer -->
+    <footer class="footer">
+     <div class="disclaimer">
+      <div class="disclaimer-title">
+       ⚠️ Important Disclaimer
+      </div>
+      <p id="disclaimer-text">Cryptocurrency investments carry risk. This is not financial advice. Pet Dat Dog is a community project and the value of any digital assets can go up or down. Never invest more than you can afford to lose. Always do your own research (DYOR) and consult with financial advisors before making investment decisions. We are committed to transparency and education, not making investment promises.</p>
+     </div>
+     <p id="footer-text">🐾 Pet Dat Dog - Building Together, Learning Together 🐾</p>
+    </footer>
+   </main>
+  </div>
+  <script>
+    // Audio Context for click sounds
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioContext = new AudioContext();
+
+    function playClickSound() {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 800;
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.1);
+    }
+
+    function playHoverSound() {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 600;
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.05);
+    }
+
+    function playBarkSound() {
+      // Create a bark sound with two quick "woofs"
+      for (let i = 0; i < 2; i++) {
+        setTimeout(() => {
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          
+          // Start at a low frequency and quickly jump up for bark effect
+          oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+          oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.05);
+          oscillator.frequency.exponentialRampToValueAtTime(150, audioContext.currentTime + 0.1);
+          
+          oscillator.type = 'sawtooth';
+          
+          gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+          
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.15);
+        }, i * 150);
+      }
+    }
+
+    const defaultConfig = {
+      background_color_light: "#f8f9fa",
+      background_color_dark: "#0f1419",
+      text_color_light: "#1a1a1a",
+      text_color_dark: "#e8e8e8",
+      primary_action_color: "#60a5fa",
+      font_family: "system-ui",
+      font_size: 16,
+      hero_title: "PET DAT DOG",
+      hero_subtitle: "Community-Driven Cryptocurrency",
+      hero_tagline: '"Building a transparent digital future together"',
+      cta_button: "JOIN NOW",
+      about_title: "What is Pet Dat Dog?",
+      about_text: "Pet Dat Dog is a community-driven digital currency project. We believe in transparency, education, and building a supportive community for everyone interested in learning about cryptocurrency - from complete beginners to experienced enthusiasts.",
+      stat_one_number: "1",
+      stat_one_label: "COMMUNITY MEMBERS",
+      stat_two_number: "$0",
+      stat_two_label: "MARKET CAP",
+      stat_three_number: "0",
+      stat_three_label: "COMMUNITY SUPPORT",
+      how_title: "How It Works",
+      how_subtitle: "Getting started with cryptocurrency doesn't have to be complicated. Here's how to join our community:",
+      step_one_title: "Learn",
+      step_one_text: "Join our community to learn about cryptocurrency basics and best practices",
+      step_two_title: "Connect",
+      step_two_text: "Meet other members and participate in community discussions",
+      step_three_title: "Grow",
+      step_three_text: "Grow your knowledge and be part of a supportive community",
+      why_title: "Why Choose Us?",
+      why_subtitle: "We prioritize transparency, education, and community support above everything else",
+      feature_one_title: "Transparent",
+      feature_one_text: "All our operations are transparent and verifiable on the blockchain. No hidden fees or surprises.",
+      feature_two_title: "Educational",
+      feature_two_text: "We provide resources and support to help you understand cryptocurrency, whether you're new or experienced.",
+      feature_three_title: "Community First",
+      feature_three_text: "Our community makes all major decisions together. Your voice matters and contributes to our direction.",
+      faq_title: "Frequently Asked Questions",
+      faq_one_q: "What is cryptocurrency?",
+      faq_one_a: "Cryptocurrency is digital money that uses encryption technology. It exists only online and isn't controlled by any government or bank. Think of it like regular money, but completely digital and decentralized.",
+      faq_two_q: "Is this safe?",
+      faq_two_a: "We prioritize security and transparency. Our smart contract is publicly audited and verified. However, all cryptocurrency investments carry risk, and you should never invest more than you can afford to lose.",
+      faq_three_q: "How do I get started?",
+      faq_three_a: "Join our community channels below to learn more. We provide educational resources and step-by-step guides for beginners. No question is too basic - we're here to help!",
+      faq_four_q: "What makes you different?",
+      faq_four_a: "We focus on education and community first. We're not promising quick riches - we're building a long-term, sustainable project where the community makes decisions together.",
+      social_title: "Join Our Community",
+      social_label_1: "Telegram",
+      social_label_2: "X (Twitter)",
+      social_label_3: "View Chart",
+      social_label_4: "Contract Address",
+      contract_code: "0x742d...4c8f",
+      disclaimer_text: "Cryptocurrency investments carry risk. This is not financial advice. Pet Dat Dog is a community project and the value of any digital assets can go up or down. Never invest more than you can afford to lose. Always do your own research (DYOR) and consult with financial advisors before making investment decisions. We are committed to transparency and education, not making investment promises.",
+      footer_text: "🐾 Pet Dat Dog - Building Together, Learning Together 🐾"
+    };
+
+    let isDarkMode = false;
+
+    // Subtle corruption effect on elements
+    function applyCorruptionEffect(element, delay = 0) {
+      setTimeout(() => {
+        element.classList.add('infected');
+        
+        // Clean up after animation
+        setTimeout(() => {
+          element.classList.remove('infected');
+        }, 800);
+      }, delay);
+    }
+
+    // Infection Animation System with Terminal Cursor Effect
+    const infectionCanvas = document.getElementById('infectionCanvas');
+    const infectionCtx = infectionCanvas.getContext('2d');
+    const terminalCursor = document.getElementById('terminalCursor');
+    let infectionCircles = [];
+    let isInfecting = false;
+    let cursorTrail = [];
+
+    function setupInfectionCanvas() {
+      infectionCanvas.width = window.innerWidth;
+      infectionCanvas.height = window.innerHeight;
+    }
+    setupInfectionCanvas();
+
+    function animateInfection(startX, startY, targetMode) {
+      isInfecting = true;
+      infectionCanvas.style.opacity = '1';
+      
+      const maxRadius = Math.sqrt(
+        Math.pow(Math.max(startX, window.innerWidth - startX), 2) +
+        Math.pow(Math.max(startY, window.innerHeight - startY), 2)
+      );
+
+      const circle = {
+        x: startX,
+        y: startY,
+        radius: 0,
+        maxRadius: maxRadius * 1.5,
+        speed: 15,
+        time: 0
+      };
+
+      infectionCircles = [circle];
+
+      // Get all elements to apply subtle corruption
+      const elementsToCorrupt = document.querySelectorAll('.binary-corrupt');
+      const corruptedElements = new Set();
+
+      function growInfection() {
+        infectionCtx.clearRect(0, 0, infectionCanvas.width, infectionCanvas.height);
+
+        circle.radius += circle.speed;
+        circle.time += 0.05;
+
+        // Check which elements are hit by the wave
+        elementsToCorrupt.forEach(element => {
+          if (!corruptedElements.has(element)) {
+            const rect = element.getBoundingClientRect();
+            const elementCenterX = rect.left + rect.width / 2;
+            const elementCenterY = rect.top + rect.height / 2;
+            const distanceToElement = Math.sqrt(
+              Math.pow(elementCenterX - circle.x, 2) + 
+              Math.pow(elementCenterY - circle.y, 2)
+            );
+            
+            // If wave hits element, apply subtle corruption
+            if (distanceToElement <= circle.radius && distanceToElement >= circle.radius - 60) {
+              corruptedElements.add(element);
+              applyCorruptionEffect(element);
+            }
+          }
+        });
+
+        // Draw smooth corruption wave with subtle distortion
+        const distortion = Math.sin(circle.time) * 3;
+        const waveRadius = circle.radius + distortion;
+        
+        if (targetMode === 'dark') {
+          // Dark mode: cool blue-green corruption wave
+          const gradient = infectionCtx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, waveRadius);
+          gradient.addColorStop(0, 'rgba(96, 165, 250, 0.2)');
+          gradient.addColorStop(0.4, 'rgba(15, 20, 25, 0.5)');
+          gradient.addColorStop(0.7, 'rgba(15, 20, 25, 0.2)');
+          gradient.addColorStop(1, 'rgba(15, 20, 25, 0)');
+          
+          infectionCtx.fillStyle = gradient;
+          infectionCtx.beginPath();
+          infectionCtx.arc(circle.x, circle.y, waveRadius, 0, Math.PI * 2);
+          infectionCtx.fill();
+
+          // Add subtle glowing edge with slight corruption
+          infectionCtx.strokeStyle = 'rgba(96, 165, 250, 0.5)';
+          infectionCtx.lineWidth = 2;
+          infectionCtx.shadowBlur = 20;
+          infectionCtx.shadowColor = '#60a5fa';
+          infectionCtx.beginPath();
+          infectionCtx.arc(circle.x, circle.y, waveRadius, 0, Math.PI * 2);
+          infectionCtx.stroke();
+          infectionCtx.shadowBlur = 0;
+        } else {
+          // Light mode: soft blue transition wave
+          const gradient = infectionCtx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, waveRadius);
+          gradient.addColorStop(0, 'rgba(59, 130, 246, 0.15)');
+          gradient.addColorStop(0.4, 'rgba(248, 249, 250, 0.4)');
+          gradient.addColorStop(0.7, 'rgba(248, 249, 250, 0.15)');
+          gradient.addColorStop(1, 'rgba(248, 249, 250, 0)');
+          
+          infectionCtx.fillStyle = gradient;
+          infectionCtx.beginPath();
+          infectionCtx.arc(circle.x, circle.y, waveRadius, 0, Math.PI * 2);
+          infectionCtx.fill();
+
+          // Add soft glowing edge
+          infectionCtx.strokeStyle = 'rgba(59, 130, 246, 0.4)';
+          infectionCtx.lineWidth = 2;
+          infectionCtx.shadowBlur = 20;
+          infectionCtx.shadowColor = '#3b82f6';
+          infectionCtx.beginPath();
+          infectionCtx.arc(circle.x, circle.y, waveRadius, 0, Math.PI * 2);
+          infectionCtx.stroke();
+          infectionCtx.shadowBlur = 0;
+        }
+
+        if (circle.radius < circle.maxRadius) {
+          requestAnimationFrame(growInfection);
+        } else {
+          setTimeout(() => {
+            infectionCanvas.style.opacity = '0';
+            terminalCursor.style.opacity = '0';
+            isInfecting = false;
+            infectionCircles = [];
+            cursorTrail = [];
+          }, 200);
+        }
+      }
+
+      growInfection();
+    }
+
+    // Node Network System
+    const canvas = document.getElementById('nodeCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let nodes = [];
+    const maxNodes = 10;
+    const connectionDistance = 120;
+    const nodeLifetime = 2000;
+    const spawnRate = 10;
+
+    function setupCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    setupCanvas();
+    window.addEventListener('resize', () => {
+      setupCanvas();
+      setupInfectionCanvas();
+    });
+
+    class Node {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.vx = (Math.random() - 0.5) * 0.4;
+        this.vy = (Math.random() - 0.5) * 0.4;
+        this.life = nodeLifetime;
+        this.maxLife = nodeLifetime;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.life -= 16;
+      }
+
+      draw() {
+        const alpha = this.life / this.maxLife;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 2.5, 0, Math.PI * 2);
+        
+        if (isDarkMode) {
+          ctx.fillStyle = `rgba(96, 165, 250, ${alpha * 0.8})`;
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = '#60a5fa';
+        } else {
+          ctx.fillStyle = `rgba(59, 130, 246, ${alpha * 0.7})`;
+          ctx.shadowBlur = 12;
+          ctx.shadowColor = '#3b82f6';
+        }
+        ctx.fill();
+      }
+    }
+
+    let frameCount = 0;
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      
+      frameCount++;
+      if (frameCount % spawnRate === 0 && nodes.length < maxNodes) {
+        nodes.push(new Node(mouseX, mouseY));
+      }
+    });
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      nodes = nodes.filter(node => node.life > 0);
+      
+      nodes.forEach((node, i) => {
+        node.update();
+        node.draw();
+        
+        nodes.slice(i + 1).forEach(otherNode => {
+          const dx = node.x - otherNode.x;
+          const dy = node.y - otherNode.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < connectionDistance) {
+            const alpha = (1 - distance / connectionDistance) * 
+                         (node.life / node.maxLife) * 
+                         (otherNode.life / otherNode.maxLife);
+            
+            ctx.beginPath();
+            ctx.moveTo(node.x, node.y);
+            ctx.lineTo(otherNode.x, otherNode.y);
+            
+            if (isDarkMode) {
+              ctx.strokeStyle = `rgba(96, 165, 250, ${alpha * 0.3})`;
+            } else {
+              ctx.strokeStyle = `rgba(59, 130, 246, ${alpha * 0.4})`;
+            }
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        });
+        
+        const dxCursor = node.x - mouseX;
+        const dyCursor = node.y - mouseY;
+        const distanceToCursor = Math.sqrt(dxCursor * dxCursor + dyCursor * dyCursor);
+        
+        if (distanceToCursor < connectionDistance) {
+          const alpha = (1 - distanceToCursor / connectionDistance) * (node.life / node.maxLife);
+          ctx.beginPath();
+          ctx.moveTo(node.x, node.y);
+          ctx.lineTo(mouseX, mouseY);
+          
+          if (isDarkMode) {
+            ctx.strokeStyle = `rgba(96, 165, 250, ${alpha * 0.5})`;
+          } else {
+            ctx.strokeStyle = `rgba(59, 130, 246, ${alpha * 0.6})`;
+          }
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+      });
+      
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Typewriter effect on tagline
+    const heroTagline = document.getElementById('hero-tagline');
+    setTimeout(() => {
+      heroTagline.classList.add('typing');
+    }, 1500);
+
+    // Intersection Observer for animations
+    const observerOptions = {
+      threshold: 0.2,
+      rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          if (entry.target.classList.contains('stat-card')) {
+            entry.target.classList.add('animate');
+            
+            // Counter animation
+            const numberEl = entry.target.querySelector('.stat-number');
+            const text = numberEl.textContent;
+            
+            if (text.includes('$') || text.includes('+') || !isNaN(parseInt(text))) {
+              animateNumber(numberEl, text);
+            }
+          }
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.stat-card').forEach(card => observer.observe(card));
+
+    function animateNumber(element, targetText) {
+      const hasPrefix = targetText.includes('$');
+      const hasSuffix = targetText.includes('+') || targetText.includes('K') || targetText.includes('M');
+      const prefix = hasPrefix ? '$' : '';
+      const match = targetText.match(/[\d.]+/);
+      const target = match ? parseFloat(match[0]) : 0;
+      const suffix = hasSuffix ? targetText.match(/[+KM]+/)[0] : '';
+      
+      let current = 0;
+      const increment = target / 30;
+      const duration = 1500;
+      const stepTime = duration / 30;
+      
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+          current = target;
+          clearInterval(timer);
+        }
+        
+        let displayValue = Math.floor(current);
+        if (target < 10 && target % 1 !== 0) {
+          displayValue = current.toFixed(1);
+        }
+        
+        element.textContent = prefix + displayValue + suffix;
+      }, stepTime);
+    }
+
+    // CTA Button - Scroll to social section
+    const ctaButton = document.getElementById('cta-button');
+    ctaButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      const socialSection = document.getElementById('social-section');
+      if (socialSection) {
+        const offset = 80; // Offset for better positioning
+        const elementPosition = socialSection.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - offset;
+        
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    });
+
+    // Social link animations before redirect
+    const telegramLink = document.getElementById('social-link-1');
+    const twitterLink = document.getElementById('social-link-2');
+    const chartLink = document.getElementById('social-link-3');
+
+    // Telegram - Plane takeoff animation
+    if (telegramLink) {
+      telegramLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        const url = telegramLink.getAttribute('href');
+        const target = telegramLink.getAttribute('target');
+        
+        // Add animation class
+        telegramLink.classList.add('animating', 'telegram-animate');
+        
+        // Redirect after animation
+        setTimeout(() => {
+          if (target === '_blank') {
+            window.open(url, target, 'noopener,noreferrer');
+          } else {
+            window.location.href = url;
+          }
+        }, 800); // Match animation duration
+      });
+    }
+
+    // Twitter/X - Spinning animation
+    if (twitterLink) {
+      twitterLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        const url = twitterLink.getAttribute('href');
+        const target = twitterLink.getAttribute('target');
+        
+        // Add animation class
+        twitterLink.classList.add('animating', 'twitter-animate');
+        
+        // Redirect after animation
+        setTimeout(() => {
+          if (target === '_blank') {
+            window.open(url, target, 'noopener,noreferrer');
+          } else {
+            window.location.href = url;
+          }
+        }, 700); // Match animation duration
+      });
+    }
+
+    // Chart - Pulse animation (for smooth scroll)
+    if (chartLink) {
+      chartLink.addEventListener('click', (e) => {
+        const href = chartLink.getAttribute('href');
+        if (href && href.startsWith('#')) {
+          e.preventDefault();
+          
+          // Add animation class
+          chartLink.classList.add('animating', 'chart-animate');
+          
+          // Scroll after animation
+          setTimeout(() => {
+            const target = document.querySelector(href);
+            if (target) {
+              const offset = 80;
+              const elementPosition = target.getBoundingClientRect().top;
+              const offsetPosition = elementPosition + window.pageYOffset - offset;
+              
+              window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+              });
+            }
+            
+            // Remove animation class after scroll starts
+            setTimeout(() => {
+              chartLink.classList.remove('animating', 'chart-animate');
+            }, 100);
+          }, 600); // Match animation duration
+        }
+      });
+    }
+
+    // Contract address copy
+    const contractAddress = document.getElementById('social-link-4');
+    const copyTooltip = document.getElementById('copy-tooltip');
+    const fullAddress = '0x742d35Cc6634C0532925a3b844Bc9e7595f04c8f';
+
+    contractAddress.addEventListener('click', () => {
+      navigator.clipboard.writeText(fullAddress).then(() => {
+        copyTooltip.classList.add('show');
+        setTimeout(() => {
+          copyTooltip.classList.remove('show');
+        }, 2000);
+      });
+    });
+
+    // Smooth scroll for anchor links (excluding chart link which has its own handler)
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      // Skip chart link as it has its own animation handler
+      if (anchor.id === 'social-link-3') return;
+      
+      anchor.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+        if (href !== '#' && href.length > 1) {
+          e.preventDefault();
+          const target = document.querySelector(href);
+          if (target) {
+            const offset = 80;
+            const elementPosition = target.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - offset;
+            
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth'
+            });
+          }
+        }
+      });
+    });
+
+    // Dark mode toggle
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    const body = document.body;
+
+    // Add bark sound to dog
+    const dogEmoji = document.getElementById('dog-emoji');
+    dogEmoji.addEventListener('click', () => {
+      playBarkSound();
+      // Add a little bounce animation on click
+      dogEmoji.style.animation = 'none';
+      setTimeout(() => {
+        dogEmoji.style.animation = 'float3d 4s ease-in-out infinite';
+      }, 10);
+    });
+
+    // Add sounds to interactive elements
+    document.querySelectorAll('.cta-button, .social-link, .faq-item, .dark-mode-toggle').forEach(el => {
+      el.addEventListener('click', () => {
+        playClickSound();
+      });
+    });
+
+    document.querySelectorAll('.stat-card, .feature-card, .step-card, .social-link').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        playHoverSound();
+      });
+    });
+
+    darkModeToggle.addEventListener('click', (e) => {
+      if (isInfecting) return;
+
+      const rect = darkModeToggle.getBoundingClientRect();
+      const buttonX = rect.left + rect.width / 2;
+      const buttonY = rect.top + rect.height / 2;
+
+      isDarkMode = !isDarkMode;
+      
+      const targetMode = isDarkMode ? 'dark' : 'light';
+      
+      // Start color transition immediately for smooth effect
+      if (isDarkMode) {
+        body.classList.remove('light-mode');
+        body.classList.add('dark-mode');
+        darkModeToggle.textContent = '☀️';
+      } else {
+        body.classList.remove('dark-mode');
+        body.classList.add('light-mode');
+        darkModeToggle.textContent = '🌙';
+      }
+      updateColors();
+      
+      // Run infection animation on top with binary corruption
+      animateInfection(buttonX, buttonY, targetMode);
+    });
+
+    function updateColors() {
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      const textColor = isDarkMode
+        ? (config.text_color_dark || defaultConfig.text_color_dark)
+        : (config.text_color_light || defaultConfig.text_color_light);
+      const primaryColor = config.primary_action_color || defaultConfig.primary_action_color;
+
+      body.style.color = textColor;
+
+      const ctaBtn = document.querySelector('.cta-button');
+      // Keep glassmorphism style for CTA button - it will inherit text color from body
+      ctaBtn.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.12) 100%)';
+      ctaBtn.style.color = '';
+
+      document.querySelectorAll('.social-link').forEach(link => {
+        link.style.color = textColor;
+      });
+    }
+
+    async function onConfigChange(config) {
+      const fontFamily = config.font_family || defaultConfig.font_family;
+      const baseFontSize = config.font_size || defaultConfig.font_size;
+
+      updateColors();
+
+      const fontStack = `${fontFamily}, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
+      document.body.style.fontFamily = fontStack;
+
+      document.querySelector('.hero-title').style.fontSize = `${baseFontSize * 3.4375}px`;
+      document.querySelector('.hero-subtitle').style.fontSize = `${baseFontSize * 1.125}px`;
+      document.querySelector('.hero-tagline').style.fontSize = `${baseFontSize * 0.8125}px`;
+      document.querySelector('.cta-button').style.fontSize = `${baseFontSize * 0.875}px`;
+      document.querySelectorAll('.section-title').forEach(el => {
+        el.style.fontSize = `${baseFontSize * 1.875}px`;
+      });
+      document.querySelectorAll('.section-subtitle').forEach(el => {
+        el.style.fontSize = `${baseFontSize * 0.75}px`;
+      });
+
+      // Update text content
+      const heroTitle = document.getElementById('hero-title');
+      const titleText = config.hero_title || defaultConfig.hero_title;
+      heroTitle.innerHTML = titleText.split('').map(char => `<span>${char}</span>`).join('');
+      document.getElementById('hero-subtitle').textContent = config.hero_subtitle || defaultConfig.hero_subtitle;
+      document.getElementById('hero-tagline').textContent = config.hero_tagline || defaultConfig.hero_tagline;
+      document.getElementById('cta-button').textContent = config.cta_button || defaultConfig.cta_button;
+      document.getElementById('about-title').textContent = config.about_title || defaultConfig.about_title;
+      document.getElementById('about-text').textContent = config.about_text || defaultConfig.about_text;
+      document.getElementById('stat-one-number').textContent = config.stat_one_number || defaultConfig.stat_one_number;
+      document.getElementById('stat-one-label').textContent = config.stat_one_label || defaultConfig.stat_one_label;
+      document.getElementById('stat-two-number').textContent = config.stat_two_number || defaultConfig.stat_two_number;
+      document.getElementById('stat-two-label').textContent = config.stat_two_label || defaultConfig.stat_two_label;
+      document.getElementById('stat-three-number').textContent = config.stat_three_number || defaultConfig.stat_three_number;
+      document.getElementById('stat-three-label').textContent = config.stat_three_label || defaultConfig.stat_three_label;
+      document.getElementById('how-title').textContent = config.how_title || defaultConfig.how_title;
+      document.getElementById('how-subtitle').textContent = config.how_subtitle || defaultConfig.how_subtitle;
+      document.getElementById('step-one-title').textContent = config.step_one_title || defaultConfig.step_one_title;
+      document.getElementById('step-one-text').textContent = config.step_one_text || defaultConfig.step_one_text;
+      document.getElementById('step-two-title').textContent = config.step_two_title || defaultConfig.step_two_title;
+      document.getElementById('step-two-text').textContent = config.step_two_text || defaultConfig.step_two_text;
+      document.getElementById('step-three-title').textContent = config.step_three_title || defaultConfig.step_three_title;
+      document.getElementById('step-three-text').textContent = config.step_three_text || defaultConfig.step_three_text;
+      document.getElementById('why-title').textContent = config.why_title || defaultConfig.why_title;
+      document.getElementById('why-subtitle').textContent = config.why_subtitle || defaultConfig.why_subtitle;
+      document.getElementById('feature-one-title').textContent = config.feature_one_title || defaultConfig.feature_one_title;
+      document.getElementById('feature-one-text').textContent = config.feature_one_text || defaultConfig.feature_one_text;
+      document.getElementById('feature-two-title').textContent = config.feature_two_title || defaultConfig.feature_two_title;
+      document.getElementById('feature-two-text').textContent = config.feature_two_text || defaultConfig.feature_two_text;
+      document.getElementById('feature-three-title').textContent = config.feature_three_title || defaultConfig.feature_three_title;
+      document.getElementById('feature-three-text').textContent = config.feature_three_text || defaultConfig.feature_three_text;
+      document.getElementById('faq-title').textContent = config.faq_title || defaultConfig.faq_title;
+      document.getElementById('faq-one-q').querySelector('span:first-child').textContent = config.faq_one_q || defaultConfig.faq_one_q;
+      document.getElementById('faq-one-a').textContent = config.faq_one_a || defaultConfig.faq_one_a;
+      document.getElementById('faq-two-q').querySelector('span:first-child').textContent = config.faq_two_q || defaultConfig.faq_two_q;
+      document.getElementById('faq-two-a').textContent = config.faq_two_a || defaultConfig.faq_two_a;
+      document.getElementById('faq-three-q').querySelector('span:first-child').textContent = config.faq_three_q || defaultConfig.faq_three_q;
+      document.getElementById('faq-three-a').textContent = config.faq_three_a || defaultConfig.faq_three_a;
+      document.getElementById('faq-four-q').querySelector('span:first-child').textContent = config.faq_four_q || defaultConfig.faq_four_q;
+      document.getElementById('faq-four-a').textContent = config.faq_four_a || defaultConfig.faq_four_a;
+      document.getElementById('social-title').textContent = config.social_title || defaultConfig.social_title;
+      document.getElementById('social-label-1').textContent = config.social_label_1 || defaultConfig.social_label_1;
+      document.getElementById('social-label-2').textContent = config.social_label_2 || defaultConfig.social_label_2;
+      document.getElementById('social-label-3').textContent = config.social_label_3 || defaultConfig.social_label_3;
+      document.getElementById('social-label-4').textContent = config.social_label_4 || defaultConfig.social_label_4;
+      document.getElementById('contract-code').textContent = config.contract_code || defaultConfig.contract_code;
+      document.getElementById('disclaimer-text').textContent = config.disclaimer_text || defaultConfig.disclaimer_text;
+      document.getElementById('footer-text').textContent = config.footer_text || defaultConfig.footer_text;
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color_light || defaultConfig.background_color_light,
+            set: (value) => {
+              config.background_color_light = value;
+              window.elementSdk.setConfig({ background_color_light: value });
+            }
+          },
+          {
+            get: () => config.background_color_dark || defaultConfig.background_color_dark,
+            set: (value) => {
+              config.background_color_dark = value;
+              window.elementSdk.setConfig({ background_color_dark: value });
+            }
+          },
+          {
+            get: () => config.text_color_light || defaultConfig.text_color_light,
+            set: (value) => {
+              config.text_color_light = value;
+              window.elementSdk.setConfig({ text_color_light: value });
+            }
+          },
+          {
+            get: () => config.text_color_dark || defaultConfig.text_color_dark,
+            set: (value) => {
+              config.text_color_dark = value;
+              window.elementSdk.setConfig({ text_color_dark: value });
+            }
+          },
+          {
+            get: () => config.primary_action_color || defaultConfig.primary_action_color,
+            set: (value) => {
+              config.primary_action_color = value;
+              window.elementSdk.setConfig({ primary_action_color: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => {
+            config.font_family = value;
+            window.elementSdk.setConfig({ font_family: value });
+          }
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (value) => {
+            config.font_size = value;
+            window.elementSdk.setConfig({ font_size: value });
+          }
+        }
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["hero_title", config.hero_title || defaultConfig.hero_title],
+        ["hero_subtitle", config.hero_subtitle || defaultConfig.hero_subtitle],
+        ["hero_tagline", config.hero_tagline || defaultConfig.hero_tagline],
+        ["cta_button", config.cta_button || defaultConfig.cta_button],
+        ["about_title", config.about_title || defaultConfig.about_title],
+        ["about_text", config.about_text || defaultConfig.about_text],
+        ["stat_one_number", config.stat_one_number || defaultConfig.stat_one_number],
+        ["stat_one_label", config.stat_one_label || defaultConfig.stat_one_label],
+        ["stat_two_number", config.stat_two_number || defaultConfig.stat_two_number],
+        ["stat_two_label", config.stat_two_label || defaultConfig.stat_two_label],
+        ["stat_three_number", config.stat_three_number || defaultConfig.stat_three_number],
+        ["stat_three_label", config.stat_three_label || defaultConfig.stat_three_label],
+        ["social_label_1", config.social_label_1 || defaultConfig.social_label_1],
+        ["social_label_2", config.social_label_2 || defaultConfig.social_label_2],
+        ["social_label_3", config.social_label_3 || defaultConfig.social_label_3],
+        ["social_label_4", config.social_label_4 || defaultConfig.social_label_4],
+        ["contract_code", config.contract_code || defaultConfig.contract_code],
+        ["footer_text", config.footer_text || defaultConfig.footer_text]
+      ]);
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a0a33a0f2a47812',t:'MTc2MzQ5NzU3NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
